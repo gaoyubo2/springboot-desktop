@@ -1,6 +1,6 @@
-package cn.cest.os.sso.mapper.manage;
+package cn.cest.os.sso.mapper;
 
-import cn.cest.os.sso.pojo.App;
+import cn.cest.os.sso.pojo.RoleApp;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2024-03-15
  */
 @Mapper
-public interface AppMapper extends BaseMapper<App> {
+public interface RoleAppMapper extends BaseMapper<RoleApp> {
 
 }

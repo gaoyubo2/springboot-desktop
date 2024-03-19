@@ -1,4 +1,4 @@
-package cn.cest.os.sso.mapper.manage;
+package cn.cest.os.sso.mapper;
 
 import cn.cest.os.sso.pojo.Role;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

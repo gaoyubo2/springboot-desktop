@@ -4,11 +4,13 @@ import cn.cest.os.sso.Service.SsoService;
 import cn.cest.os.sso.Util.Result;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
+import com.ramostear.captcha.HappyCaptcha;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +45,11 @@ public class SsoController {
      * @return 用户uid
      */
     @PostMapping("/login")
-    public Result<Map<String,Object>> login(@RequestParam("username") String username,
+    public Result<Map<String,Object>> login(HttpServletRequest request, @RequestParam("username") String username,
                                             @RequestParam("password") String password,
-                                            @RequestParam("requestUrl") String url){
+                                            @RequestParam("code") String code){
+        boolean flag = HappyCaptcha.verification(request,code,true);
+        if (!flag) return Result.fail("验证码错误");
         //获取uid
         Integer uid = ssoService.getUidBuUserNameAndPwd(username,password);
         if(uid == -1) {
@@ -56,7 +60,7 @@ public class SsoController {
         //返回重定向
         Map<String,Object> map = new HashMap<>();
         map.put("uid",uid);
-        map.put("redirect",url);
+        //map.put("redirect",url);
         //获取session
         SaSession session = StpUtil.getSessionByLoginId(uid);
         map.put("session",session);

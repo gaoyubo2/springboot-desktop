@@ -1,6 +1,6 @@
-package cn.cest.os.sso.mapper.manage;
+package cn.cest.os.sso.mapper;
 
-import cn.cest.os.sso.pojo.User;
+import cn.cest.os.sso.pojo.App;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2024-03-15
  */
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
+public interface AppMapper extends BaseMapper<App> {
 
 }

@@ -1,9 +1,8 @@
 package cn.cest.os.sso.Service.impl;
 
 import cn.cest.os.sso.Service.SsoService;
-import cn.cest.os.sso.Service.UserService;
-import cn.cest.os.sso.mapper.manage.RoleAppMapper;
-import cn.cest.os.sso.mapper.manage.UserMapper;
+import cn.cest.os.sso.mapper.RoleAppMapper;
+import cn.cest.os.sso.mapper.UserMapper;
 import cn.cest.os.sso.pojo.RoleApp;
 import cn.cest.os.sso.pojo.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
