@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cest.os.sso.mapper.desktop.DesktopAppMapper">
+    <select id="selectAppByAPPId " resultType="cn.cest.os.sso.pojo.desktop.AppModel" parameterType="Integer">
+        select *
+        from tb_app
+        where tbid = #{appId}
+    </select>
+</mapper>
