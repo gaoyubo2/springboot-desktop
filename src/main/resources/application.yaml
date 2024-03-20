@@ -31,7 +31,7 @@ spring:
         max-idle: 8
         max-wait: -1
         min-idle: 0
-
+#10.56.181.180:3306/managetest
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://10.56.181.180:3306/managetest?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC

@@ -17,8 +17,6 @@ import java.util.Map;
 
 @RestController
 public class SsoController {
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     private final SsoService ssoService;
 
