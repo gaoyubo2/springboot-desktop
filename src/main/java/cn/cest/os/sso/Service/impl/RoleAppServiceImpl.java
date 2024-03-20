@@ -1,6 +1,8 @@
 package cn.cest.os.sso.Service.impl;
 
-import cn.cest.os.sso.mapper.desktop.MemberAppMapper;
+import cn.cest.os.sso.Service.DesktopService;
+import cn.cest.os.sso.Service.RoleService;
+import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.RoleApp;
 import cn.cest.os.sso.mapper.manage.RoleAppMapper;
 import cn.cest.os.sso.Service.RoleAppService;
@@ -13,7 +15,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import cn.cest.os.sso.mapper.desktop.DesktopAppMapper;
 
 import java.util.List;
 
@@ -28,13 +29,11 @@ import java.util.List;
 @Service
 public class RoleAppServiceImpl extends ServiceImpl<RoleAppMapper, RoleApp> implements RoleAppService {
 
-    private final MemberAppMapper memberAppMapper;
-    private final DesktopAppMapper desktopAppMapper;
+    @Autowired
+    private DesktopService desktopService;
 
-    public RoleAppServiceImpl(MemberAppMapper memberAppMapper, DesktopAppMapper desktopAppMapper) {
-        this.memberAppMapper = memberAppMapper;
-        this.desktopAppMapper = desktopAppMapper;
-    }
+    @Autowired
+    private RoleService roleService;
 
     /**
      * 添加角色应用权限
@@ -47,20 +46,24 @@ public class RoleAppServiceImpl extends ServiceImpl<RoleAppMapper, RoleApp> impl
     public Boolean addRoleApp(RoleAppIdDTO roleAppIdDTO) {
         try {
             List<Integer> appIdList = roleAppIdDTO.getAppIdList();
-            Integer roleId = roleAppIdDTO.getRoleId();
+            //添加角色
+            Role role = new Role();
+            role.setName(roleAppIdDTO.getName());
+            roleService.save(role);
+            Integer roleId = role.getTbid();
+            //为角色添加权限
             for(Integer appId: appIdList){
-                //根据id查询
-                AppModel appModel = desktopAppMapper.selectAppByAPPId(appId);
-                //添加appid和roleId
+                //根据id查询，查询desktop的AppModel
+                AppModel appModel = desktopService.getAppModelById(appId);
+                //添加权限：添加appid和roleId
                 baseMapper.insert(new RoleApp(null,appId,roleId));
-//                //添加Manage角色权限
-//                appModel.setMember_id(roleId);
-                //插入Desktop的memberApp
+                //为用户添加角色权限：插入Desktop的memberApp
                 MemberAppModel memberAppModel = new MemberAppModel();
                 BeanUtils.copyProperties(appModel,memberAppModel);
                 memberAppModel.setRealid(appId);
+                //memberId字段当作角色
                 memberAppModel.setMemberId(roleId);
-                memberAppMapper.insert(memberAppModel);
+                desktopService.addMemberAppModel(memberAppModel);
             }
             return true;
         } catch (BeansException e) {

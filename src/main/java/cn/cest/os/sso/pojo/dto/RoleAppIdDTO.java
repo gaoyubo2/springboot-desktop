@@ -11,8 +11,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class RoleAppIdDTO {
-    private Integer roleId;
-    @TableField("name")
     private String name;;
     private List<Integer> appIdList;
 }
