@@ -4,17 +4,21 @@ import cn.cest.os.sso.Service.SsoService;
 import cn.cest.os.sso.Util.Result;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.google.code.kaptcha.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 public class SsoController {
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private final SsoService ssoService;
 
@@ -45,7 +49,25 @@ public class SsoController {
     @PostMapping("/login")
     public Result<Map<String,Object>> login(@RequestParam("username") String username,
                                             @RequestParam("password") String password,
-                                            @RequestParam("requestUrl") String url){
+                                            @RequestParam("requestUrl") String url,
+                                            @RequestParam(value = "code", required = true) String code,
+                                            HttpServletRequest request
+                                            ){
+
+
+        HttpSession session2 = request.getSession();
+        String sessioncode = (String) session2.getAttribute("logincode");
+        //System.out.println("验证时：session id："+session2.getId());
+        //System.out.println(sessioncode);
+        boolean codeFlag = code.equalsIgnoreCase(sessioncode);
+        if(!codeFlag){
+            return Result.fail("验证码错误");
+        }
+        else{
+            System.out.println("验证码验证成功");
+        }
+        //以上增加验证码验证逻辑
+
         //获取uid
         Integer uid = ssoService.getUidBuUserNameAndPwd(username,password);
         if(uid == -1) {

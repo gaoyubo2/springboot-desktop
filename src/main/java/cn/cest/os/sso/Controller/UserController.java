@@ -8,6 +8,7 @@ import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.User;
 import cn.cest.os.sso.pojo.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,8 +53,14 @@ public class UserController {
         return userById!=null?Result.ok(userById,"查询成功"):Result.fail("查询失败");
     }
     @GetMapping("users")
-    public Result<List<UserInfoVO>> getUsers(){
-        List<User> users = userService.list(null);
+    public Result<List<UserInfoVO>> getUsers(@RequestParam(value = "pageNum", required = true) Integer pageNum, @RequestParam(value = "pageSize", required = true) Integer pageSize){
+        Page<User> page = new Page<>(pageNum, pageSize);
+        userService.page(page, null);
+        List<User> users = page.getRecords();
+        if(users == null)
+            return Result.fail("获取用户列表失败");
+
+        //List<User> users = userService.list(null);
         System.out.println(users);
         List<UserInfoVO> userInfoVOList = new ArrayList<>(users.size());
         for(User user: users){
