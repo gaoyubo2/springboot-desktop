@@ -21,9 +21,17 @@ spring:
     host: 127.0.0.1
     port: 6379
     # 根据自己设置的密码决定
-    password:
+    timeout: 6000
     # 操作0号数据库，默认有16个数据库
     database: 0
+    password:
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+        min-idle: 0
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://10.56.181.180:3306/managetest?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
