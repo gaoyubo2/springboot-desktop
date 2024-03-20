@@ -1,11 +1,18 @@
 package cn.cest.os.sso.Controller;
 
 
+import cn.cest.os.sso.Service.RoleService;
 import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.Util.Result;
+import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.User;
+import cn.cest.os.sso.pojo.vo.UserInfoVO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -20,6 +27,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoleService roleService;
 
     @PostMapping("user")
     public Result<Integer> addUser(@RequestBody User user){
@@ -42,6 +51,18 @@ public class UserController {
         User userById = userService.getById(user);
         return userById!=null?Result.ok(userById,"查询成功"):Result.fail("查询失败");
     }
+    @GetMapping("users")
+    public Result<List<UserInfoVO>> getUsers(){
+        List<User> users = userService.list(null);
+        System.out.println(users);
+        List<UserInfoVO> userInfoVOList = new ArrayList<>(users.size());
+        for(User user: users){
+            userService.extracted(userInfoVOList, user);
+        }
+        return Result.ok(userInfoVOList,"获取用户列表成功");
+    }
+
+
 
 }
 

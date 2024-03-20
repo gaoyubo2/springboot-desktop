@@ -44,3 +44,9 @@ spring:
       time-between-eviction-runs-millis: 60000
       min-evictable-idle-time-millis: 300000
       filters: stat,wall,slf4j
+
+# desktop配置
+desktop:
+  getAppModelById: http://10.56.183.138:8084/data/app?appId={appId}
+  getApps: http://10.56.183.138:8084/data/apps
+  addMemberAppModel: http://10.56.183.138:8084/data/memberApp
