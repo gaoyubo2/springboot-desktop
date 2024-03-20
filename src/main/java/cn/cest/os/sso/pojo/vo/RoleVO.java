@@ -1,15 +1,18 @@
-package cn.cest.os.sso.pojo;
+package cn.cest.os.sso.pojo.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author gaoyubo
@@ -18,7 +21,9 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Role implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class RoleVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,8 +31,6 @@ public class Role implements Serializable {
     private Integer tbid;
 
     private String name;
-    private String createTime;
-    private String updateTime;
-    private Integer isDelete;
+
 
 }

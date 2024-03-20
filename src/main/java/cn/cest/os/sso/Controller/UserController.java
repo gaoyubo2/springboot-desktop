@@ -31,25 +31,25 @@ public class UserController {
     @Autowired
     private RoleService roleService;
 
-    @PostMapping("user")
-    public Result<Integer> addUser(@RequestBody User user){
-        boolean flag = userService.save(user);
-        Integer userId = userService.getById(user).getTbid();
-        return flag?Result.ok(userId,"添加成功"):Result.fail("添加失败");
-    }
+//    @PostMapping("user")
+//    public Result<Integer> addUser(@RequestBody User user){
+//        boolean flag = userService.save(user);
+//        Integer userId = userService.getById(user).getTbid();
+//        return flag?Result.ok(userId,"添加成功"):Result.fail("添加失败");
+//    }
     @DeleteMapping("user")
     public Result<Boolean> deleteUser(@RequestBody User user){
         boolean flag = userService.removeById(user);
         return flag?Result.ok(true,"删除成功"):Result.fail(false,"添加失败");
     }
-    @PostMapping("user2")
-    public Result<Boolean> changeUser(@RequestBody User user){
-        boolean flag = userService.save(user);
-        return flag?Result.ok(true,"更改成功"):Result.fail(false,"更改失败");
+    @PostMapping("user")
+    public Result<Boolean> saveOrUpdateUser(@RequestBody User user){
+        boolean flag = userService.saveOrUpdate(user);
+        return flag?Result.ok(true,"操作成功"):Result.fail(false,"操作失败");
     }
     @GetMapping("user")
-    public Result<User> getUser(@RequestBody User user){
-        User userById = userService.getById(user);
+    public Result<User> getUser(@RequestParam Integer uid){
+        User userById = userService.getById(uid);
         return userById!=null?Result.ok(userById,"查询成功"):Result.fail("查询失败");
     }
     @GetMapping("users")
@@ -68,7 +68,15 @@ public class UserController {
         }
         return Result.ok(userInfoVOList,"获取用户列表成功");
     }
+    @DeleteMapping("deleteUsers")
+    public Result<Boolean> deleteUser(@RequestBody List<Integer> uids){
+        for (Integer uid: uids){
+            boolean flag = userService.removeById(uid);
+            if(!flag) Result.fail(false,"删除失败");
+        }
 
+        return Result.ok(true,"删除成功");
+    }
 
 
 }

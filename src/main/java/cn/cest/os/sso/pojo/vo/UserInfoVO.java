@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -20,9 +22,9 @@ public class UserInfoVO {
 
     private String username;
 
-    private String password;
-
     private Integer roleId;
 
     private String roleName;
+
+    private Date createTime;
 }
