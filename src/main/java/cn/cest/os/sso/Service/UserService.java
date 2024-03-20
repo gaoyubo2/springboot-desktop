@@ -17,4 +17,8 @@ import java.util.List;
 public interface UserService extends IService<User> {
 
     void extracted(List<UserInfoVO> userInfoVOList, User user);
+
+    Boolean addUserAndMember(User user);
+
+    Boolean changeUserAndMember(User user);
 }

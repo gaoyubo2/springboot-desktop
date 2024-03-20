@@ -31,10 +31,10 @@ spring:
         max-idle: 8
         max-wait: -1
         min-idle: 0
-#10.56.181.180:3306/managetest
+#localhost:3306/managetest
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://10.56.181.180:3306/managetest?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/managetest?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
     password: 123456
     druid:
@@ -55,6 +55,8 @@ spring:
 
 # desktop配置
 desktop:
-  getAppModelById: http://10.56.183.138:8084/data/app?appId={appId}
-  getApps: http://10.56.183.138:8084/data/apps
-  addMemberAppModel: http://10.56.183.138:8084/data/memberApp
+  getAppModelById: http://localhost:8084/data/app?appId={appId}
+  getApps: http://localhost:8084/data/apps
+  addMemberAppModel: http://localhost:8084/data/memberApp
+  addMemberModel: http://localhost:8084/data/member
+  updateMemberByUserName: http://localhost:8084/data/updateMember

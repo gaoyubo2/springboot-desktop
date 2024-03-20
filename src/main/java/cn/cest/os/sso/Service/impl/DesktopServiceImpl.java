@@ -1,9 +1,9 @@
 package cn.cest.os.sso.Service.impl;
 
 import cn.cest.os.sso.Service.DesktopService;
-import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.pojo.desktop.AppModel;
 import cn.cest.os.sso.pojo.desktop.MemberAppModel;
+import cn.cest.os.sso.pojo.desktop.MemberModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +29,12 @@ public class DesktopServiceImpl implements DesktopService {
     @Value("${desktop.addMemberAppModel}")
     private String addMemberAppModel;
 
+    @Value("${desktop.addMemberModel}")
+    private String addMemberModel;
+
+    @Value("${desktop.updateMemberByUserName}")
+    private String updateMemberByUserName;
+
     @Override
     public AppModel getAppModelById(Integer appId) {
         return restTemplate.getForObject(getAppModelById, AppModel.class,appId);
@@ -39,12 +45,11 @@ public class DesktopServiceImpl implements DesktopService {
         return restTemplate.getForObject(getApps, List.class);
     }
 
-    @Override
-    public Boolean addMemberAppModel(MemberAppModel memberAppModel) {
+    private Boolean addObject(Object object, String Url) {
         try {
             // 将对象转换为 JSON 字符串
             ObjectMapper objectMapper = new ObjectMapper();
-            String requestBody = objectMapper.writeValueAsString(memberAppModel);
+            String requestBody = objectMapper.writeValueAsString(object);
 
             // 设置请求头
             HttpHeaders headers = new HttpHeaders();
@@ -54,13 +59,27 @@ public class DesktopServiceImpl implements DesktopService {
             HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
             // 发送 POST 请求
-            return restTemplate.postForObject(addMemberAppModel, requestEntity, Boolean.class);
+            return restTemplate.postForObject(Url, requestEntity, Boolean.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
+    @Override
+    public Boolean addMemberAppModel(MemberAppModel memberAppModel) {
+        return addObject(memberAppModel, addMemberAppModel);
+    }
+
+    @Override
+    public Boolean addMemberModel(MemberModel memberModel) {
+        return addObject(memberModel, addMemberModel);
+    }
+
+    @Override
+    public Boolean updateMemberByUserName(MemberModel memberModel) {
+        return addObject(memberModel,updateMemberByUserName);
+    }
 
 
 }

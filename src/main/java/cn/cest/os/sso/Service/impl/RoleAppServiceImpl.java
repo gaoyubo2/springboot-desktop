@@ -53,17 +53,18 @@ public class RoleAppServiceImpl extends ServiceImpl<RoleAppMapper, RoleApp> impl
             Integer roleId = role.getTbid();
             //为角色添加权限
             for(Integer appId: appIdList){
-                //根据id查询，查询desktop的AppModel
-                AppModel appModel = desktopService.getAppModelById(appId);
                 //添加权限：添加appid和roleId
                 baseMapper.insert(new RoleApp(null,appId,roleId));
+
                 //为用户添加角色权限：插入Desktop的memberApp
+                AppModel appModel = desktopService.getAppModelById(appId);
                 MemberAppModel memberAppModel = new MemberAppModel();
                 BeanUtils.copyProperties(appModel,memberAppModel);
                 memberAppModel.setRealid(appId);
-                //memberId字段当作角色
                 memberAppModel.setMemberId(roleId);
+                memberAppModel.setType("window");
                 desktopService.addMemberAppModel(memberAppModel);
+
             }
             return true;
         } catch (BeansException e) {

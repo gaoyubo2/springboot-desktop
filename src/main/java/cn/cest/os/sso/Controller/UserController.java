@@ -31,21 +31,20 @@ public class UserController {
     @Autowired
     private RoleService roleService;
 
-//    @PostMapping("user")
-//    public Result<Integer> addUser(@RequestBody User user){
-//        boolean flag = userService.save(user);
-//        Integer userId = userService.getById(user).getTbid();
-//        return flag?Result.ok(userId,"添加成功"):Result.fail("添加失败");
-//    }
     @DeleteMapping("user")
     public Result<Boolean> deleteUser(@RequestBody User user){
         boolean flag = userService.removeById(user);
         return flag?Result.ok(true,"删除成功"):Result.fail(false,"添加失败");
     }
     @PostMapping("user")
-    public Result<Boolean> saveOrUpdateUser(@RequestBody User user){
-        boolean flag = userService.saveOrUpdate(user);
-        return flag?Result.ok(true,"操作成功"):Result.fail(false,"操作失败");
+    public Result<Boolean> saveUser(@RequestBody User user){
+        Boolean flag = userService.addUserAndMember(user);
+        return flag?Result.ok(true,"添加成功"):Result.fail(false,"添加失败");
+    }
+    @PutMapping("user")
+    public Result<Boolean> putUser(@RequestBody User user){
+        Boolean flag = userService.changeUserAndMember(user);
+        return flag?Result.ok(true,"修改成功"):Result.fail(false,"修改失败");
     }
     @GetMapping("user")
     public Result<User> getUser(@RequestParam Integer uid){
