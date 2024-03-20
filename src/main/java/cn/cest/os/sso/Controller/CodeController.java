@@ -1,9 +1,8 @@
 package cn.cest.os.sso.Controller;
 
-import com.google.code.kaptcha.Constants;
+
 import com.google.code.kaptcha.Producer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -16,8 +15,6 @@ import java.awt.image.BufferedImage;
 
 @Controller
 public class CodeController {
-    @Autowired
-    private RedisTemplate redisTemplate;
     @Autowired
     private Producer captchaProducer ;
 
