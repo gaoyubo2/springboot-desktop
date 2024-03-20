@@ -1,7 +1,10 @@
 package cn.cest.os.sso.Service;
 
 import cn.cest.os.sso.pojo.User;
+import cn.cest.os.sso.pojo.vo.UserInfoVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface UserService extends IService<User> {
 
+    void extracted(List<UserInfoVO> userInfoVOList, User user);
 }
