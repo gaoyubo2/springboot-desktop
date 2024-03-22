@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 
 /**
  * <p>
@@ -200,5 +202,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return true;
 
         return false;
+    }
+
+    @Override
+    public Boolean ifRoleChange(Integer roleId, Integer tbid) {
+        //获取之前roleId
+        Integer beforeRoleId = this.getById(tbid).getRoleId();
+        return !Objects.equals(beforeRoleId, roleId);
     }
 }
