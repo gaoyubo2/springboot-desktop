@@ -3,16 +3,14 @@ package cn.cest.os.sso.Controller;
 import cn.cest.os.sso.Service.SsoService;
 import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.Util.Result;
-import cn.cest.os.sso.mapper.manage.UserMapper;
 import cn.cest.os.sso.pojo.User;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
-import com.google.code.kaptcha.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +42,24 @@ public class SsoController {
         return Result.fail(false,"未登录，token无效");
     }
 
+
+    @GetMapping("/session")
+    public Result<SaSession> getToken(@RequestParam("uid") Integer uid){
+        SaSession sessionByLoginId = StpUtil.getSessionByLoginId(uid);
+        return Result.ok(sessionByLoginId,"获取session成功");
+    }
+    @GetMapping("/permissions")
+    public Result<List<Integer>> getPermissionList(@RequestParam("uid") Integer uid){
+        //获取权限列表
+        List<Integer> permissionList = ssoService.getPermissionListByUid(uid);
+        return Result.ok(permissionList,"获取权限列表成功");
+    }
+    @GetMapping("getInfoByToken")
+    public Map<String,Object> getTokenSessionByToken(HttpServletRequest request, HttpServletResponse response){
+        String token = request.getHeader("token");
+        SaSession sessionByToken = StpUtil.getTokenSessionByToken(token);
+        return sessionByToken.getDataMap();
+    }
     /**
      * 登录接口
      * @param username 用户名
@@ -56,7 +72,7 @@ public class SsoController {
                                             @RequestParam("requestUrl") String url,
                                             @RequestParam(value = "code", required = true) String code,
                                             HttpServletRequest request
-                                            ){
+    ){
 
 
         HttpSession code_session = request.getSession();
@@ -96,36 +112,4 @@ public class SsoController {
         map.put("session",session);
         return Result.ok(map,"登录成功");
     }
-    @GetMapping("/session")
-    public Result<SaSession> getToken(@RequestParam("uid") Integer uid){
-        //获取uid
-//        Integer uid = ssoService.getUidBuUserNameAndPwd(username,password);
-        //获取session
-        SaSession sessionByLoginId = StpUtil.getSessionByLoginId(uid);
-        return Result.ok(sessionByLoginId,"获取session成功");
-    }
-    @GetMapping("/permissions")
-    public Result<List<Integer>> getPermissionList(@RequestParam("uid") Integer uid){
-        //获取权限列表
-        List<Integer> permissionList = ssoService.getPermissionListByUid(uid);
-        return Result.ok(permissionList,"获取权限列表成功");
-    }
-
-
-    /**
-     * 退出登录
-     * @return 成功标志
-     */
-    @PostMapping("/logout")
-    public Result<Boolean> logout(){
-        try {
-            StpUtil.logout();
-            return Result.ok(true,"退出成功");
-        } catch (Exception e) {
-            //todo 记录日志
-            return Result.fail(false,"退出失败");
-        }
-    }
-
-
 }

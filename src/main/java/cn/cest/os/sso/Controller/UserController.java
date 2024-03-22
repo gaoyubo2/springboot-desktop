@@ -3,7 +3,9 @@ package cn.cest.os.sso.Controller;
 
 import cn.cest.os.sso.Enum.CodeEnum;
 import cn.cest.os.sso.Exception.NoGetExecption;
+import cn.cest.os.sso.Service.DesktopService;
 import cn.cest.os.sso.Service.RoleService;
+import cn.cest.os.sso.Service.SsoService;
 import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.mapper.manage.UserMapper;
@@ -11,14 +13,18 @@ import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.User;
 import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.UserInfoVO;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -38,6 +44,8 @@ public class UserController {
     private UserMapper userMapper;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private DesktopService desktopService;
 
     @DeleteMapping("deleteUsers")
     public Result<Boolean> deleteUser(@RequestBody List<Integer> uids){
@@ -64,20 +72,27 @@ public class UserController {
         return flag?Result.ok(true,"添加成功"):Result.fail(false,"添加失败");
     }
     @PutMapping("user")
+    @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> putUser(@RequestBody User user){
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.eq("tbid",user.getTbid());
-        User user_old = userMapper.selectOne(userQueryWrapper);
-
-        if(user_old.getUsername().equals(user.getUsername()))
+        QueryWrapper<User> queryWrapper = new QueryWrapper<User>().eq("username", user.getUsername()).ne("tbid", user.getTbid());
+        User other = userMapper.selectOne(queryWrapper);
+        if(other != null)
             return Result.fail("用户名无法修改");
         //以上增加判断修改用户名是否重复判断
-
-
         Boolean roleChange = userService.ifRoleChange(user.getRoleId(),user.getTbid());
-        Boolean flag = userService.changeUserAndMember(user,roleChange);
-        System.out.println(flag);
-        return (flag == null || !flag)?Result.fail(false,"修改失败"):Result.ok(true,"修改成功");
+        //修改用户名、修改member表
+        String originName = userService.getById(user.getTbid()).getUsername();
+        Boolean flag = desktopService.updateUsername(originName,user.getUsername());
+        if (!flag) return Result.fail("修改用户名称失败");
+        //修改无权限部分
+        boolean flagNoApp = userService.updateById(user);
+        boolean flagWithApp = true;
+        if (roleChange) {
+            System.out.println("用户权限改变了");
+            flagWithApp  = userService.changeUserAndMember(user);
+            System.out.println("flagWithApp:"+flagNoApp);
+        }
+        return (flagNoApp && flagWithApp)?Result.ok(true,"修改成功"):Result.fail(false,"修改失败");
     }
     @GetMapping("user")
     public Result<User> getUser(@RequestParam Integer uid){

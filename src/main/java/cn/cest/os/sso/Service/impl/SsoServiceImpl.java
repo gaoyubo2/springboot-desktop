@@ -6,6 +6,8 @@ import cn.cest.os.sso.mapper.manage.RoleAppMapper;
 import cn.cest.os.sso.mapper.manage.UserMapper;
 import cn.cest.os.sso.pojo.RoleApp;
 import cn.cest.os.sso.pojo.User;
+import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,5 +60,17 @@ public class SsoServiceImpl implements SsoService {
         }
         return permissionList;
 
+    }
+
+    @Override
+    public String loginAndSetSession(Integer uid, String username) {
+        StpUtil.login(uid);
+        SaSession session = StpUtil.getSessionByLoginId(uid);
+        //获取用户角色
+        Integer roleId = userMapper.selectById(uid).getRoleId();
+        session.set("username",username);
+        session.set("uid",uid);
+        session.set("roleId",roleId);
+        return StpUtil.getTokenValue();
     }
 }

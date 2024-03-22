@@ -1,23 +1,33 @@
 package cn.cest.os.sso.Service.impl;
 
 import cn.cest.os.sso.Service.DesktopService;
+import cn.cest.os.sso.Service.UserService;
+import cn.cest.os.sso.pojo.User;
 import cn.cest.os.sso.pojo.desktop.AppModel;
 import cn.cest.os.sso.pojo.desktop.MemberAppModel;
 import cn.cest.os.sso.pojo.desktop.MemberModel;
+import cn.cest.os.sso.pojo.vo.MemberNameVO;
+import cn.cest.os.sso.pojo.vo.RoleWithAppsNoChildVO;
+import cn.cest.os.sso.pojo.vo.RoleWithMembersAndAppsVO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class DesktopServiceImpl implements DesktopService {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private UserService userService;
 
     @Value("${desktop.getAppModelById}")
     private String getAppModelById;
@@ -33,6 +43,12 @@ public class DesktopServiceImpl implements DesktopService {
 
     @Value("${desktop.updateMemberByUserName}")
     private String updateMemberByUserName;
+
+    @Value("${desktop.modifyRoleApp}")
+    private String modifyRoleApp;
+
+    @Value("${desktop.updateMemberName}")
+    private String updateMemberName;
 
     @Override
     public AppModel getAppModelById(Integer appId) {
@@ -90,8 +106,37 @@ public class DesktopServiceImpl implements DesktopService {
 
     @Override
     public Boolean updateMemberByUserName(MemberModel memberModel) {
+        System.out.println("新的MemberModel:"+memberModel);
         return addObject(memberModel,updateMemberByUserName);
     }
 
+    @Override
 
+    public Boolean modifyRoleApp(RoleWithAppsNoChildVO role) {
+        System.out.println("RoleWithAppsNoChildVO:"+role);
+        //获取该角色的username列表
+        List<User> users = userService.list(new QueryWrapper<User>().eq("role_id", role.getRoleId()));
+        //封装username
+        List<String> usernameList = new ArrayList<>(users.size());
+        for(User user: users){
+            usernameList.add(user.getUsername());
+        }
+        System.out.println("usernameList:"+usernameList);
+        //封装vo类
+        RoleWithMembersAndAppsVO roleWithMembersAndAppsVO = new RoleWithMembersAndAppsVO();
+        roleWithMembersAndAppsVO.setRoleId(roleWithMembersAndAppsVO.getRoleId());
+        roleWithMembersAndAppsVO.setUsernameList(usernameList);
+        roleWithMembersAndAppsVO.setAppList(role.getAppList());
+        System.out.println("roleWithMembersAndAppsVO:"+roleWithMembersAndAppsVO);
+        return addObject(roleWithMembersAndAppsVO,updateMemberByUserName);
+    }
+
+    @Override
+    public Boolean updateUsername(String originName, String newName) {
+        if (originName.equals(newName)) return true;
+        MemberNameVO memberNameVO = new MemberNameVO();
+        memberNameVO.setNewName(newName);
+        memberNameVO.setOriginName(originName);
+        return addObject(memberNameVO,updateMemberName);
+    }
 }

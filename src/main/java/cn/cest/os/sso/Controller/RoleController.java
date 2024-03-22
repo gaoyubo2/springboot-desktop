@@ -115,11 +115,11 @@ public class RoleController {
             //添加结果集
             roleWithApps.add(roleWithAppsVO);
         }
-        if(roleWithApps != null && roleWithApps.size() != 0){
-            return Result.ok(new PageResult(count, roleWithApps));
-            //return Result.ok(roleWithApps,"获取角色列表成功");
-        }
-        return Result.fail("获取角色列表失败");
+//        if(roleWithApps != null && roleWithApps.size() != 0){
+//            return Result.ok(new PageResult(count, roleWithApps));
+//            //return Result.ok(roleWithApps,"获取角色列表成功");
+//        }
+        return Result.ok(new PageResult(count, roleWithApps));
     }
 
     //接口为展示多级角色，需要role增加字段 parentid进行实现

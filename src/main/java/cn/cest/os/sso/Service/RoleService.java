@@ -28,4 +28,6 @@ public interface RoleService extends IService<Role> {
     List<Role> getEnableRoles();
 
     boolean enableRole(Integer roleId, Integer isDelete);
+
+    Boolean updateByRole(Integer roleId, String name);
 }

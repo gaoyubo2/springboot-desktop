@@ -60,6 +60,8 @@ desktop:
   addMemberAppModel: http://localhost:8084/data/memberApp
   addMemberModel: http://localhost:8084/data/member
   updateMemberByUserName: http://localhost:8084/data/updateMember
+  modifyRoleApp: http://localhost:8084/data/modifyRoleApp
+  updateMemberName: http://localhost:8084/data/updateMemberName
 
 #mybatis-plus:
 #  global-config:

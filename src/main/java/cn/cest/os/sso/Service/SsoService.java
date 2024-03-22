@@ -18,4 +18,6 @@ public interface SsoService {
      * @return 权限列表
      */
     List<Integer> getPermissionListByUid(Integer uid);
+
+    String loginAndSetSession(Integer uid, String username);
 }

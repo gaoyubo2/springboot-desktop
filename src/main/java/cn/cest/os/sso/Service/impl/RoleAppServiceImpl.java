@@ -9,6 +9,7 @@ import cn.cest.os.sso.Service.RoleAppService;
 import cn.cest.os.sso.pojo.desktop.AppModel;
 import cn.cest.os.sso.pojo.desktop.MemberAppModel;
 import cn.cest.os.sso.pojo.dto.RoleAppIdDTO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +45,10 @@ public class RoleAppServiceImpl extends ServiceImpl<RoleAppMapper, RoleApp> impl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean addRoleApp(RoleAppIdDTO roleAppIdDTO) {
+    public Boolean addRoleApp(RoleAppIdDTO roleAppIdDTO,Boolean sameName) {
+        //判断是否存在同名
+        long count = roleService.count(new QueryWrapper<Role>().eq("name", roleAppIdDTO.getName()));
+        if(count != 0) return false;
         try {
             List<Integer> appIdList = roleAppIdDTO.getAppIdList();
             //添加角色
@@ -71,6 +76,49 @@ public class RoleAppServiceImpl extends ServiceImpl<RoleAppMapper, RoleApp> impl
             e.printStackTrace();
             return false;
         }
+    }
+    // 比较两个角色的权限信息是否相同
+    @Override
+    public boolean hasModifyRoleApp(Integer roleId, List<Integer> updatedPermissions) {
+        // 获取原始角色的权限
+        List<Integer> originalPermissions = getRoleAppByRoleId(roleId);
+        System.out.println("原始权限："+originalPermissions);
+        System.out.println("修改权限："+updatedPermissions);
+        // 判断权限列表长度是否相同，若不相同则说明权限已经改变
+        if (originalPermissions.size() != updatedPermissions.size()) {
+            return true;
+        }
+        // 判断两个权限列表中的元素是否相同
+        for (Integer permission : originalPermissions) {
+            // 若更新后的权限列表中不包含原始权限列表中的某一权限，则说明权限已经改变
+            if (!updatedPermissions.contains(permission)) {
+                return true;
+            }
+        }
+        // 所有权限都相同，则说明权限未改变
+        return false;
+    }
+
+    @Override
+    public List<Integer> getRoleAppByRoleId(Integer roleId) {
+        List<RoleApp> roleApps = this.list(new QueryWrapper<RoleApp>().eq("role_id", roleId));
+        List<Integer> appList = new ArrayList<>(roleApps.size());
+        for(RoleApp roleApp : roleApps){
+            appList.add(roleApp.getAppId());
+        }
+        return appList;
+
+    }
+
+    @Override
+    public Boolean removeAllWithRoleId(Integer roleId) {
+        System.out.println("roleId:"+roleId);
+        //删除role,roleApp
+        boolean flag1 = roleService.removeById(roleId);
+        System.out.println("删除flag1success");
+        boolean flag2 = this.remove(new QueryWrapper<RoleApp>().eq("role_id",roleId));
+        System.out.println("删除flag2success");
+        return flag1 && flag2;
     }
 
 }

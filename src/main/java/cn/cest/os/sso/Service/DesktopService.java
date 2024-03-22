@@ -4,6 +4,7 @@ import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.pojo.desktop.AppModel;
 import cn.cest.os.sso.pojo.desktop.MemberAppModel;
 import cn.cest.os.sso.pojo.desktop.MemberModel;
+import cn.cest.os.sso.pojo.vo.RoleWithAppsNoChildVO;
 
 import java.util.List;
 
@@ -17,4 +18,7 @@ public interface DesktopService {
 
     Boolean updateMemberByUserName(MemberModel memberModel);
 
+    Boolean modifyRoleApp(RoleWithAppsNoChildVO roleWithAppsNoChildVO);
+
+    Boolean updateUsername(String originName, String username);
 }

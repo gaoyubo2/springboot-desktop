@@ -5,6 +5,8 @@ import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.UserInfoVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -21,7 +23,7 @@ public interface UserService extends IService<User> {
 
     Boolean addUserAndMember(User user);
 
-    Boolean changeUserAndMember(User user,Boolean roleChange);
+    Boolean changeUserAndMember(User user);
 
     Boolean ifRoleChange(Integer roleId, Integer tbid);
 

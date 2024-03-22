@@ -1,14 +1,12 @@
 package cn.cest.os.sso.Service.impl;
 
-import cn.cest.os.sso.Service.DesktopService;
-import cn.cest.os.sso.Service.RoleAppService;
-import cn.cest.os.sso.Service.RoleService;
+import cn.cest.os.sso.Service.*;
+import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.mapper.manage.RoleMapper;
 import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.RoleApp;
 import cn.cest.os.sso.pojo.User;
 import cn.cest.os.sso.mapper.manage.UserMapper;
-import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.pojo.desktop.MemberModel;
 import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.UserInfoVO;
@@ -20,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +46,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RoleMapper roleMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private SsoService ssoService;
+
     @Override
     public void extracted(List<UserInfoVO> userInfoVOList, User user) {
         System.out.println(user);
@@ -83,9 +86,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private String extractAppList(User user) {
+        //获取新角色权限
         List<RoleApp> roleApps = roleAppService.list(new QueryWrapper<RoleApp>().eq("role_id", user.getRoleId()));
         StringBuilder stringBuilder = new StringBuilder();
-        // 获取用户的权限列表
+        // 拼接用户的权限列表
         for (RoleApp roleApp: roleApps){
             stringBuilder.append(roleApp.getAppId());
             stringBuilder.append(",");
@@ -116,27 +120,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return desktopService.addMemberModel(memberModel);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Boolean changeUserAndMember(User user,Boolean roleChange) {
-        boolean flag = this.updateById(user);
-        if(!roleChange) return flag;
-        //获取所有信息
-        user = this.getById(user.getTbid());
-
+    public Boolean changeUserAndMember(User user) {
+        System.out.println("要修改权限的用户："+user);
         String roleApps = extractAppList(user);
+        System.out.println("新的权限列表："+ roleApps);
         //修改Member的Desk1
         MemberModel memberModel = new MemberModel();
         memberModel.setUsername(user.getUsername());
         memberModel.setDesk1(roleApps);
-
         //清空dock和desk
         memberModel.setDock(null);
         memberModel.setDesk2(null);
         memberModel.setDesk3(null);
         memberModel.setDesk4(null);
         memberModel.setDesk5(null);
-
+        System.out.println("新的memberModel:"+memberModel);
         //修改
         return desktopService.updateMemberByUserName(memberModel);
     }
@@ -204,10 +203,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return false;
     }
 
+//    @Override
+//    public Boolean checkCaptcha(HttpSession httpSession, HttpServletRequest request, String code) {
+//        HttpSession code_session = request.getSession();
+//        String sessioncode = (String) code_session.getAttribute("logincode");
+//        //System.out.println("验证时：session id："+session2.getId());
+//        //System.out.println(sessioncode);
+//        boolean codeFlag = code.equalsIgnoreCase(sessioncode);
+//        code_session.removeAttribute("logincode");
+//        if(!codeFlag){
+//            return false;
+//        }
+//        else{
+//            return true;
+//        }
+//    }
+//
+//    @Override
+//    public Integer checkUsernameAndPwd(String username, String password) {
+//        Integer uid = ssoService.getUidBuUserNameAndPwd(username,password);
+//        if(uid == -1) {
+//            return -1;
+//        }
+//        //被禁用账户无法登录
+//        User user = baseMapper.selectById(uid);
+//        if(user.getIsDelete() == 1){
+//            return -2;
+//        }
+//        return uid;
+//    }
+
     @Override
     public Boolean ifRoleChange(Integer roleId, Integer tbid) {
         //获取之前roleId
         Integer beforeRoleId = this.getById(tbid).getRoleId();
+        System.out.println("oldeRol:"+beforeRoleId);
+        System.out.println("newRole:"+roleId);
         return !Objects.equals(beforeRoleId, roleId);
     }
 }

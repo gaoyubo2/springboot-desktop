@@ -120,6 +120,20 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     }
 
     @Override
+    public Boolean updateByRole(Integer roleId, String name) {
+        try {
+            Role role = new Role();
+            role.setName(name);
+            role.setTbid(roleId);
+            baseMapper.updateById(role);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public List<Role> getEnableRoles() {
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
         roleQueryWrapper.eq("is_delete", 0);
