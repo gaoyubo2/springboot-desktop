@@ -26,4 +26,6 @@ public interface UserService extends IService<User> {
     PageResult search(Integer pageNum, Integer pageSize, String rolename, String username);
 
     Boolean deleteusers(List<Integer> uids);
+
+    Boolean enableUser(Integer userId, Integer isDelete);
 }

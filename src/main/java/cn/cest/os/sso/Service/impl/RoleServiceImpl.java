@@ -1,5 +1,6 @@
 package cn.cest.os.sso.Service.impl;
 
+import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.mapper.manage.UserMapper;
 import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.mapper.manage.RoleMapper;
@@ -8,6 +9,7 @@ import cn.cest.os.sso.pojo.User;
 import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.RoleTreeVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,41 +80,61 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     }
 
-    @Override
-    public List<RoleTreeVO> findChildrenRoles(Integer parentId) {
-        List<RoleTreeVO> childrenRoles = new ArrayList<>();
-
-        // 查询当前父级角色ID对应的子级角色列表
-        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("parentid", parentId);
-        List<Role> directChildren = this.list(queryWrapper);
-
-        // 如果存在直接子级角色，递归查询其下一级子级角色列表
-        if (directChildren != null && !directChildren.isEmpty()) {
-            for (Role child : directChildren) {
-                // 递归调用，获取下一级子级角色列表
-                List<RoleTreeVO> grandChildren = findChildrenRoles(child.getTbid());
-                // 创建 RoleTreeVO 对象并设置属性
-                RoleTreeVO roleTreeVO = new RoleTreeVO()
-                        .setRoleTreeId(child.getTbid())
-                        .setRoleTreeName(child.getName())
-                        .setChild(grandChildren);
-                // 将当前角色添加到列表中
-                childrenRoles.add(roleTreeVO);
-            }
-        }
-
-        return childrenRoles;
-    }
+//    @Override
+//    public List<RoleTreeVO> findChildrenRoles(Integer parentId) {
+//        List<RoleTreeVO> childrenRoles = new ArrayList<>();
+//
+//        // 查询当前父级角色ID对应的子级角色列表
+//        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("parentid", parentId);
+//        List<Role> directChildren = this.list(queryWrapper);
+//
+//        // 如果存在直接子级角色，递归查询其下一级子级角色列表
+//        if (directChildren != null && !directChildren.isEmpty()) {
+//            for (Role child : directChildren) {
+//                // 递归调用，获取下一级子级角色列表
+//                List<RoleTreeVO> grandChildren = findChildrenRoles(child.getTbid());
+//                // 创建 RoleTreeVO 对象并设置属性
+//                RoleTreeVO roleTreeVO = new RoleTreeVO()
+//                        .setRoleTreeId(child.getTbid())
+//                        .setRoleTreeName(child.getName())
+//                        .setChild(grandChildren);
+//                // 将当前角色添加到列表中
+//                childrenRoles.add(roleTreeVO);
+//            }
+//        }
+//
+//        return childrenRoles;
+//    }
 
     @Override
     public PageResult selectByName(String roleName, Integer pageNum, Integer pageSize) {
 
         Page<Role> page = new Page<>(pageNum, pageSize);
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
-        roleQueryWrapper.eq("rolename", roleName);
-
-
-        return null;
+        roleQueryWrapper.like("name", roleName);
+        IPage<Role> rolePage = roleMapper.selectPage(page, roleQueryWrapper);
+        List<Role> records = rolePage.getRecords();
+        int size = records.size();
+        return new PageResult(size, records);
     }
+
+    @Override
+    public List<Role> getEnableRoles() {
+        QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
+        roleQueryWrapper.eq("is_delete", 0);
+        List<Role> roles = roleMapper.selectList(roleQueryWrapper);
+        return roles;
+    }
+
+    @Override
+    public boolean enableRole(Integer roleId, Integer isDelete) {
+        Role role = roleMapper.selectById(roleId);
+        role.setIsDelete(isDelete);
+        int i = roleMapper.updateById(role);
+        if(i != 0)
+            return true;
+        return false;
+    }
+
 }

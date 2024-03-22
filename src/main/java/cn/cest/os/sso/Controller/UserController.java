@@ -1,6 +1,8 @@
 package cn.cest.os.sso.Controller;
 
 
+import cn.cest.os.sso.Enum.CodeEnum;
+import cn.cest.os.sso.Exception.NoGetExecption;
 import cn.cest.os.sso.Service.RoleService;
 import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.Util.Result;
@@ -36,7 +38,7 @@ public class UserController {
     @Autowired
     private RoleService roleService;
 
-    @DeleteMapping("user")
+    @DeleteMapping("deleteUsers")
     public Result<Boolean> deleteUser(@RequestBody List<Integer> uids){
         for(Integer userid:uids){
             boolean flag = userService.removeById(userid);
@@ -52,8 +54,8 @@ public class UserController {
     public Result<Boolean> saveUser(@RequestBody User user){
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("username",user.getUsername());
-        User user1 = userMapper.selectOne(userQueryWrapper);
-        if(user1 != null)
+        User user_old = userMapper.selectOne(userQueryWrapper);
+        if(user_old != null)
             return Result.fail("用户名重复，请再次尝试");
         //以上增加判断新增用户名是否重复判断
 
@@ -66,8 +68,8 @@ public class UserController {
         userQueryWrapper.eq("tbid",user.getTbid());
         User user_old = userMapper.selectOne(userQueryWrapper);
 
-        //if(user_old.getUsername() != user.getUsername())
-        //    return Result.fail("用户名无法修改");
+        if(user_old.getUsername().equals(user.getUsername()))
+            return Result.fail("用户名无法修改");
         //以上增加判断修改用户名是否重复判断
 
 
@@ -98,6 +100,17 @@ public class UserController {
         if(!flag)
             return Result.fail("删除用户失败");
         return Result.ok(true,"删除用户成功");
+
+        //throw new NoGetExecption(CodeEnum.RC500.getCode(), CodeEnum.RC500.getMsg());
+    }
+
+    @PutMapping("enableUser")
+    public Result enableUser(@RequestParam Integer userId,
+                             @RequestParam Integer isDelete){
+        Boolean flag = userService.enableUser(userId, isDelete);
+        if(!flag)
+            return Result.fail("用户状态修改失败");
+        return Result.ok(true, "用户状态修改成功");
     }
 
 

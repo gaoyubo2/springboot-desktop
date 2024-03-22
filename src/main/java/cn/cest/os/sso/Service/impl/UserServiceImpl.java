@@ -162,8 +162,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         for (User user : records) {
             extracted(userInfoVOList, user);
         }
-        //Long count = userMapper.selectCount(null);
-        return new PageResult(records.size(), userInfoVOList);
+        //返回符合条件的所有total
+        Long count = userMapper.selectCount(userQueryWrapper);
+        return new PageResult(count, userInfoVOList);
     }
 
     @Override
@@ -176,5 +177,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public Boolean enableUser(Integer userId, Integer isDelete) {
+        User user = userMapper.selectById(userId);
+        Integer roleId = user.getRoleId();
+        Role role = roleMapper.selectById(roleId);
+
+        //用户所属角色未启用
+        if(role.getIsDelete() == 1)
+            return false;
+        user.setIsDelete(isDelete);
+        int i = userMapper.updateById(user);
+        if(i != 0)
+            return true;
+
+        return false;
     }
 }

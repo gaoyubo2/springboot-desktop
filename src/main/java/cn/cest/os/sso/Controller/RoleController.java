@@ -78,13 +78,19 @@ public class RoleController {
     }
     @GetMapping("rolesWithApps")
     public Result<PageResult> getRolesWithApps(@RequestParam(value = "pageNum", required = true) Integer pageNum,
-                                               @RequestParam(value = "pageSize", required = true) Integer pageSize){
+                                               @RequestParam(value = "pageSize", required = true) Integer pageSize,
+                                               @RequestParam(value="roleName", required = false) String roleName){
 
         Page<Role> page = new Page<>(pageNum, pageSize);
 
         //封装分页返回结果 total
-        Long count = roleService.getBaseMapper().selectCount(null);
-        roleService.getBaseMapper().selectPage(page, null);
+        QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
+        if(roleName != null){
+            roleQueryWrapper.like("name", roleName);
+        }
+
+        Long count = roleService.getBaseMapper().selectCount(roleQueryWrapper);
+        roleService.getBaseMapper().selectPage(page, roleQueryWrapper);
         List<Role> roles = page.getRecords();     //得到分页查询的roles，还需要加入app
 
 
@@ -116,24 +122,48 @@ public class RoleController {
     }
 
     //接口为展示多级角色，需要role增加字段 parentid进行实现
-    @GetMapping("/showroles")
-    public Result<List<RoleTreeVO>> showRoles(){
-        List<RoleTreeVO> result =  roleService.findChildrenRoles(0);
-        if(result == null){
-            return Result.fail("获取角色列表失败");
-        }
-        return Result.ok(result);
-    }
+//    @GetMapping("/showroles")
+//    public Result<List<RoleTreeVO>> showRoles(){
+//        List<RoleTreeVO> result =  roleService.findChildrenRoles(0);
+//        if(result == null){
+//            return Result.fail("获取角色列表失败");
+//        }
+//        return Result.ok(result);
+//    }
 
     @GetMapping("rolebyname")
     public Result<PageResult> getRolesByName(@RequestParam(value = "roleName", required = true) String roleName,
                                              @RequestParam(value = "pageNum", required = true) Integer pageNum,
-                                             @RequestParam(value = "pageSize", required = true) Integer pageSize){
+                                             @RequestParam(value = "pageSize", required = false) Integer pageSize){
         PageResult pageResult = roleService.selectByName(roleName, pageNum, pageSize);
         if(pageResult == null)
             return Result.fail("查询角色列表失败");
         return Result.ok(pageResult);
     }
+
+    @GetMapping("getEnableRoles")
+    public Result<List<Role>> getEnableRoles(){
+        List<Role> roles = roleService.getEnableRoles();
+        if(roles == null)
+            return Result.fail("获取角色列表失败");
+        return Result.ok(roles);
+    }
+
+
+    @PutMapping("enableRole")
+    public Result enableRole(@RequestParam Integer roleId,
+                             @RequestParam Integer isDelete){
+        boolean flag = roleService.enableRole(roleId, isDelete);
+        if(!flag)
+            return Result.fail("修改角色状态失败");
+        return Result.ok(true, "修改角色状态成功");
+
+    }
+
+//    @PutMapping("changeRole")
+//    public Result changeRole(@RequestParam ){
+//
+//    }
 
 
 }

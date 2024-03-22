@@ -21,7 +21,11 @@ public interface RoleService extends IService<Role> {
 
     List<RoleTreeVO> showRoles();
 
-    List<RoleTreeVO> findChildrenRoles(Integer parentId);
+    //List<RoleTreeVO> findChildrenRoles(Integer parentId);
 
     PageResult selectByName(String roleName, Integer pageNum, Integer pageSize);
+
+    List<Role> getEnableRoles();
+
+    boolean enableRole(Integer roleId, Integer isDelete);
 }
