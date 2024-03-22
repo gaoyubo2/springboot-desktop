@@ -210,11 +210,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Integer beforeRoleId = this.getById(tbid).getRoleId();
         return !Objects.equals(beforeRoleId, roleId);
     }
-
-    @Override
-    public Boolean ifRoleChange(Integer roleId, Integer tbid) {
-        //获取之前roleId
-        Integer beforeRoleId = this.getById(tbid).getRoleId();
-        return !Objects.equals(beforeRoleId, roleId);
-    }
 }
