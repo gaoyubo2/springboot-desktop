@@ -6,13 +6,16 @@ import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.mapper.manage.AppMapper;
 import cn.cest.os.sso.pojo.App;
 import cn.cest.os.sso.pojo.desktop.AppModel;
+import cn.cest.os.sso.pojo.vo.AppVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,12 +34,21 @@ public class AppController {
     private DesktopService desktopService;
 
     @GetMapping("/apps")
-    public Result<List<AppModel>> getAppVO(){
+    public Result<List<AppVO>> getAppVO(){
         List<AppModel> apps = desktopService.getApps();
-        if(apps == null || apps.size() == 0 ){
+        List<AppVO> apps2 = new ArrayList<AppVO>(apps.size());
+
+        for(AppModel appModel:apps){
+            AppVO appVO = new AppVO();
+            BeanUtils.copyProperties(appModel, appVO);
+            apps2.add(appVO);
+        }
+
+
+        if(apps2 == null || apps2.size() == 0 ){
             return Result.fail("获取应用列表失败");
         }
-        return Result.ok(apps,"获取应用列表成功");
+        return Result.ok(apps2);
     }
 
 //    @GetMapping("/app")

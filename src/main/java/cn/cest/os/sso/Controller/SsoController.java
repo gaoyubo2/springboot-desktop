@@ -1,7 +1,10 @@
 package cn.cest.os.sso.Controller;
 
 import cn.cest.os.sso.Service.SsoService;
+import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.Util.Result;
+import cn.cest.os.sso.mapper.manage.UserMapper;
+import cn.cest.os.sso.pojo.User;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import com.google.code.kaptcha.Constants;
@@ -17,6 +20,8 @@ import java.util.Map;
 
 @RestController
 public class SsoController {
+    @Autowired
+    private UserService userService;
 
     private final SsoService ssoService;
 
@@ -53,11 +58,12 @@ public class SsoController {
                                             ){
 
 
-        HttpSession session2 = request.getSession();
-        String sessioncode = (String) session2.getAttribute("logincode");
+        HttpSession code_session = request.getSession();
+        String sessioncode = (String) code_session.getAttribute("logincode");
         //System.out.println("验证时：session id："+session2.getId());
         //System.out.println(sessioncode);
         boolean codeFlag = code.equalsIgnoreCase(sessioncode);
+        code_session.removeAttribute("logincode");
         if(!codeFlag){
             return Result.fail("验证码错误");
         }
@@ -71,6 +77,13 @@ public class SsoController {
         if(uid == -1) {
             return Result.fail("用户名或密码错误");
         }
+        //被禁用账户无法登录
+        User user = userService.getBaseMapper().selectById(uid);
+        if(user.getIsDelete() == 1){
+            return Result.fail("当前用户被禁用");
+        }
+
+
         //登录
         StpUtil.login(uid);
         //返回重定向

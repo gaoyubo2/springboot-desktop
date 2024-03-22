@@ -27,4 +27,6 @@ public class UserInfoVO {
     private String roleName;
 
     private Date createTime;
+
+    private Integer isDelete;
 }

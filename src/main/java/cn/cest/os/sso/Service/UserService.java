@@ -1,6 +1,7 @@
 package cn.cest.os.sso.Service;
 
 import cn.cest.os.sso.pojo.User;
+import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.UserInfoVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -21,4 +22,8 @@ public interface UserService extends IService<User> {
     Boolean addUserAndMember(User user);
 
     Boolean changeUserAndMember(User user);
+
+    PageResult search(Integer pageNum, Integer pageSize, String rolename, String username);
+
+    Boolean deleteusers(List<Integer> uids);
 }

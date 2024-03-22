@@ -9,10 +9,13 @@ import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.RoleApp;
 import cn.cest.os.sso.pojo.desktop.AppModel;
 
+import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.AppWithChildVO;
+import cn.cest.os.sso.pojo.vo.RoleTreeVO;
 import cn.cest.os.sso.pojo.vo.RoleVO;
 import cn.cest.os.sso.pojo.vo.RoleWithAppsVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -60,9 +63,12 @@ public class RoleController {
         }
         return Result.fail("获取角色列表失败");
     }
-    @DeleteMapping("role")
-    public Result<Boolean> deleteRole(@RequestBody Role role){
-        boolean flag = roleService.removeById(role);
+    @DeleteMapping("deleterole")
+    public Result<Boolean> deleteRole(@RequestBody List<Integer> roleIds){
+//        for(Integer roleid:roleIds){
+//            roleService.
+//        }
+        boolean flag =  roleService.deleteUserAndRole(roleIds);
         if(flag){
             return Result.ok(true,"删除角色成功");
         }
@@ -71,8 +77,18 @@ public class RoleController {
         //cyl
     }
     @GetMapping("rolesWithApps")
-    public Result<List<RoleWithAppsVO>> getRolesWithApps(){
-        List<Role> roles = roleService.list(null);
+    public Result<PageResult> getRolesWithApps(@RequestParam(value = "pageNum", required = true) Integer pageNum,
+                                               @RequestParam(value = "pageSize", required = true) Integer pageSize){
+
+        Page<Role> page = new Page<>(pageNum, pageSize);
+
+        //封装分页返回结果 total
+        Long count = roleService.getBaseMapper().selectCount(null);
+        roleService.getBaseMapper().selectPage(page, null);
+        List<Role> roles = page.getRecords();     //得到分页查询的roles，还需要加入app
+
+
+        //List<Role> roles = roleService.list(null);
         List<RoleWithAppsVO> roleWithApps = new ArrayList<>(roles.size());
         for (Role role: roles){
             List<RoleApp> appsIds = roleAppService.list(new QueryWrapper<RoleApp>().eq("role_id", role.getTbid()));
@@ -93,9 +109,30 @@ public class RoleController {
             roleWithApps.add(roleWithAppsVO);
         }
         if(roleWithApps != null && roleWithApps.size() != 0){
-            return Result.ok(roleWithApps,"获取角色列表成功");
+            return Result.ok(new PageResult(count, roleWithApps));
+            //return Result.ok(roleWithApps,"获取角色列表成功");
         }
         return Result.fail("获取角色列表失败");
+    }
+
+    //接口为展示多级角色，需要role增加字段 parentid进行实现
+    @GetMapping("/showroles")
+    public Result<List<RoleTreeVO>> showRoles(){
+        List<RoleTreeVO> result =  roleService.findChildrenRoles(0);
+        if(result == null){
+            return Result.fail("获取角色列表失败");
+        }
+        return Result.ok(result);
+    }
+
+    @GetMapping("rolebyname")
+    public Result<PageResult> getRolesByName(@RequestParam(value = "roleName", required = true) String roleName,
+                                             @RequestParam(value = "pageNum", required = true) Integer pageNum,
+                                             @RequestParam(value = "pageSize", required = true) Integer pageSize){
+        PageResult pageResult = roleService.selectByName(roleName, pageNum, pageSize);
+        if(pageResult == null)
+            return Result.fail("查询角色列表失败");
+        return Result.ok(pageResult);
     }
 
 

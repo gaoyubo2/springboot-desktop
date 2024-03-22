@@ -17,8 +17,5 @@ public class AppVO implements Serializable {
 
     private String name; //图标名称
 
-    private String icon;//图标图片
-
-    private String url;//图标链接
 
 }

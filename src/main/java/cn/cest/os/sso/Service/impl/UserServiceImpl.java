@@ -3,19 +3,24 @@ package cn.cest.os.sso.Service.impl;
 import cn.cest.os.sso.Service.DesktopService;
 import cn.cest.os.sso.Service.RoleAppService;
 import cn.cest.os.sso.Service.RoleService;
+import cn.cest.os.sso.mapper.manage.RoleMapper;
 import cn.cest.os.sso.pojo.Role;
 import cn.cest.os.sso.pojo.RoleApp;
 import cn.cest.os.sso.pojo.User;
 import cn.cest.os.sso.mapper.manage.UserMapper;
 import cn.cest.os.sso.Service.UserService;
 import cn.cest.os.sso.pojo.desktop.MemberModel;
+import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.pojo.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +40,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RoleAppService roleAppService;
     @Autowired
     private DesktopService desktopService;
+    @Autowired
+    private RoleMapper roleMapper;
+    @Autowired
+    private UserMapper userMapper;
     @Override
     public void extracted(List<UserInfoVO> userInfoVOList, User user) {
         System.out.println(user);
@@ -46,6 +55,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userInfoVO.setCreateTime(user.getCreateTime());
         userInfoVO.setRoleId(roleId);
         userInfoVO.setRoleName(role.getName());
+        userInfoVO.setIsDelete(user.getIsDelete());
         userInfoVOList.add(userInfoVO);
     }
 
@@ -121,5 +131,50 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //修改
         return desktopService.updateMemberByUserName(memberModel);
+    }
+
+    @Override
+    public PageResult search(Integer pageNum, Integer pageSize, String rolename, String username) {
+        Page<User> page = new Page<>(pageNum, pageSize);
+
+        //有username 就构造username的分页条件
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        if (username != null && !username.isEmpty()) {
+            userQueryWrapper.like("username", username);
+        }
+
+        //有rolename 就构造rolename的分页条件
+        if (rolename != null && !rolename.isEmpty()) {
+            // 构建查询角色名对应的roleId
+            QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
+            roleQueryWrapper.eq("name", rolename);
+            Role role = roleMapper.selectOne(roleQueryWrapper);
+            if (role != null) {
+                userQueryWrapper.eq("role_id", role.getTbid());
+            } else {
+                // 如果查询不到对应的 roleId，则直接返回空结果
+                return null;
+            }
+        }
+        IPage<User> userPage = userMapper.selectPage(page, userQueryWrapper);
+        List<UserInfoVO> userInfoVOList = new ArrayList<>();
+        List<User> records = userPage.getRecords();
+        for (User user : records) {
+            extracted(userInfoVOList, user);
+        }
+        //Long count = userMapper.selectCount(null);
+        return new PageResult(records.size(), userInfoVOList);
+    }
+
+    @Override
+    public Boolean deleteusers(List<Integer> uids) {
+        for(Integer id:uids){
+            User user = userMapper.selectById(id);
+            user.setIsDelete(1);
+            int i = userMapper.updateById(user);
+            if(i == 0)
+                return false;
+        }
+        return true;
     }
 }

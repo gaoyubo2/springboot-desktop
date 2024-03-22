@@ -7,9 +7,8 @@ import cn.cest.os.sso.pojo.desktop.MemberModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,7 +41,20 @@ public class DesktopServiceImpl implements DesktopService {
 
     @Override
     public List<AppModel> getApps() {
-        return restTemplate.getForObject(getApps, List.class);
+        try {
+            ResponseEntity<List<AppModel>> responseEntity = restTemplate.exchange(getApps, HttpMethod.GET, null, new ParameterizedTypeReference<List<AppModel>>() {});
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                List<AppModel> result = responseEntity.getBody();
+                if (result != null && !result.isEmpty()) {
+                    return result;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+        //return restTemplate.getForObject(getApps, List.class);
+
     }
 
     private Boolean addObject(Object object, String Url) {

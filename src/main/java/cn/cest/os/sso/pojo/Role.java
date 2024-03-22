@@ -25,6 +25,9 @@ public class Role implements Serializable {
     @TableId(value = "tbid", type = IdType.AUTO)
     private Integer tbid;
 
+    //多级角色时启用
+    //private Integer parentid;
+
     private String name;
     private String createTime;
     private String updateTime;
