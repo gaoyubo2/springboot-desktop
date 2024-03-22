@@ -10,6 +10,7 @@ import cn.cest.os.sso.pojo.vo.AppVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,9 +28,8 @@ import java.util.List;
  * @since 2024-03-15
  */
 @RestController
+@CrossOrigin
 public class AppController {
-    @Autowired
-    private AppMapper appMapper;
     @Autowired
     private DesktopService desktopService;
 

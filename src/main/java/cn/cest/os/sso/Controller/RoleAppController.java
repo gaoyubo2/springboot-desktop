@@ -6,11 +6,7 @@ import cn.cest.os.sso.Service.RoleService;
 import cn.cest.os.sso.Util.Result;
 import cn.cest.os.sso.pojo.dto.RoleAppIdDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -21,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2024-03-15
  */
 @RestController
+@CrossOrigin
 public class RoleAppController {
     @Autowired
     private RoleAppService roleAppService;

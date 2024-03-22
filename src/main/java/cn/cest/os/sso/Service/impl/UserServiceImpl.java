@@ -114,8 +114,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return desktopService.addMemberModel(memberModel);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Boolean changeUserAndMember(User user) {
+    public Boolean changeUserAndMember(User user,Boolean roleChange) {
+        boolean flag = this.updateById(user);
+        if(!roleChange) return flag;
+        //获取所有信息
+        user = this.getById(user.getTbid());
+
         String roleApps = extractAppList(user);
         //修改Member的Desk1
         MemberModel memberModel = new MemberModel();
