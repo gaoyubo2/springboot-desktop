@@ -12,6 +12,7 @@ import cn.cest.os.sso.pojo.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -71,8 +72,10 @@ public class UserController {
         //以上增加判断修改用户名是否重复判断
 
 
-        Boolean flag = userService.changeUserAndMember(user);
-        return flag?Result.ok(true,"修改成功"):Result.fail(false,"修改失败");
+        Boolean roleChange = userService.ifRoleChange(user.getRoleId(),user.getTbid());
+        Boolean flag = userService.changeUserAndMember(user,roleChange);
+        System.out.println(flag);
+        return (flag == null || !flag)?Result.fail(false,"修改失败"):Result.ok(true,"修改成功");
     }
     @GetMapping("user")
     public Result<User> getUser(@RequestParam Integer uid){

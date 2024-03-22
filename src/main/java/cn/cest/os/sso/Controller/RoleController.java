@@ -32,6 +32,7 @@ import java.util.List;
  * @since 2024-03-15
  */
 @RestController
+@CrossOrigin
 public class RoleController {
     @Autowired
     private RoleService roleService;

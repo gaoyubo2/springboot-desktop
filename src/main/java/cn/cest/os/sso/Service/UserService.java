@@ -21,7 +21,9 @@ public interface UserService extends IService<User> {
 
     Boolean addUserAndMember(User user);
 
-    Boolean changeUserAndMember(User user);
+    Boolean changeUserAndMember(User user,Boolean roleChange);
+
+    Boolean ifRoleChange(Integer roleId, Integer tbid);
 
     PageResult search(Integer pageNum, Integer pageSize, String rolename, String username);
 
