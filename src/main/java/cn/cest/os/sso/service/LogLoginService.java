@@ -12,5 +12,5 @@ public interface LogLoginService extends IService<LogLogin> {
     PageResult getLogs(Integer pageNum, Integer pageSum);
 
     Boolean deleteLogs(List<Integer> ids);
-    List<LogLogin> getByUsernameAndDate(String username, Date startDate, Date endDate);
+    PageResult getByUsernameAndDate(String username, Date startDate, Date endDate, Integer pageNum, Integer pageSize);
 }

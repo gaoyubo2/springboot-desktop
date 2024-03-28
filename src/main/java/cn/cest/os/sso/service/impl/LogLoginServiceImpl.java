@@ -41,7 +41,9 @@ public class LogLoginServiceImpl extends ServiceImpl<LogLoginMapper, LogLogin> i
         return true;
     }
     @Override
-    public List<LogLogin> getByUsernameAndDate(String username, Date startDate, Date endDate) {
+    public PageResult getByUsernameAndDate(String username, Date startDate, Date endDate, Integer pageNum, Integer pageSize) {
+        Page<LogLogin> page = new Page<>(pageNum, pageSize);
+
         QueryWrapper<LogLogin> queryWrapper = new QueryWrapper<>();
         if (username != null && !username.isEmpty()) {
             queryWrapper.eq("username", username);
@@ -53,7 +55,9 @@ public class LogLoginServiceImpl extends ServiceImpl<LogLoginMapper, LogLogin> i
             // 如果 endDate 不为空，将其增加一天作为查询条件，包括当天的数据
             queryWrapper.le("login_time", new Date(endDate.getTime() + 24 * 60 * 60 * 1000));
         }
-        return baseMapper.selectList(queryWrapper);
+        Page<LogLogin> res = baseMapper.selectPage(page, queryWrapper);
+        List<LogLogin> records = res.getRecords();
+        return new PageResult(res.getTotal(),records);
     }
 }
 

@@ -23,12 +23,17 @@ public class LogLoginController {
         return Result.ok(list,"获取登录日志成功");
     }
     @GetMapping("/logLoginByDateAndUser")
-    public List<LogLogin> getByUsernameAndDate(
+    public Result<PageResult> getByUsernameAndDate(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) Date startDate,
-            @RequestParam(required = false) Date endDate) {
+            @RequestParam(required = false) Date endDate,
+            @RequestParam(value = "pageNum", required = true) Integer pageNum,
+            @RequestParam(value = "pageSize", required = true) Integer pageSize) {
         //左闭 右闭
-        return logLoginService.getByUsernameAndDate(username, startDate, endDate);
+        PageResult res = logLoginService.getByUsernameAndDate(username, startDate, endDate, pageNum, pageSize);
+        if(res == null)
+            return Result.fail("查询失败");
+        return Result.ok(res);
     }
 
     @GetMapping("/loginLogs")
