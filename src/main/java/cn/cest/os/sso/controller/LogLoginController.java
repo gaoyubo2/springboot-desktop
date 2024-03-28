@@ -7,6 +7,8 @@ import cn.cest.os.sso.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -19,6 +21,18 @@ public class LogLoginController {
     public Result<List<LogLogin>> getAllLogLogin(){
         List<LogLogin> list = logLoginService.list();
         return Result.ok(list,"获取登录日志成功");
+    }
+    @GetMapping("/logLoginByDateAndUser")
+    public List<LogLogin> getByUsernameAndDate(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) Date startDate,
+            @RequestParam(required = false) Date endDate) {
+        //左闭 右闭
+        if (endDate != null) {
+            LocalDate nextDay = LocalDate.parse(endDate.toString()).plusDays(1);
+            endDate = Date.valueOf(nextDay);
+        }
+        return logLoginService.getByUsernameAndDate(username, startDate, endDate);
     }
 
     @GetMapping("/loginLogs")

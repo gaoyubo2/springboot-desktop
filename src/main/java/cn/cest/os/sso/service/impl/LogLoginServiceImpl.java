@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.logging.LogManager;
 
+import java.sql.Date;
+import java.util.List;
+
 @Service
 
 public class LogLoginServiceImpl extends ServiceImpl<LogLoginMapper, LogLogin> implements LogLoginService {
@@ -23,7 +26,7 @@ public class LogLoginServiceImpl extends ServiceImpl<LogLoginMapper, LogLogin> i
         Page<LogLogin> page = new Page<>(pageNum, pageSum);
         Page<LogLogin> logLoginPage = this.baseMapper.selectPage(page, null);
         List<LogLogin> records = logLoginPage.getRecords();
-        Integer total = Math.toIntExact(this.baseMapper.selectCount(null));
+        int total = Math.toIntExact(this.baseMapper.selectCount(null));
         return new PageResult(total, records);
     }
 
@@ -35,6 +38,10 @@ public class LogLoginServiceImpl extends ServiceImpl<LogLoginMapper, LogLogin> i
                 return false;
         }
         return true;
+    }
+    @Override
+    public List<LogLogin> getByUsernameAndDate(String username, Date startDate, Date endDate) {
+        return baseMapper.selectByUsernameAndDate(username, startDate, endDate);
     }
 }
 
