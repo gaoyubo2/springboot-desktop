@@ -1,11 +1,11 @@
 package cn.cest.os.sso.controller;
 
 import cn.cest.os.sso.pojo.LogLogin;
+import cn.cest.os.sso.pojo.result.PageResult;
 import cn.cest.os.sso.service.LogLoginService;
 import cn.cest.os.sso.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +19,23 @@ public class LogLoginController {
     public Result<List<LogLogin>> getAllLogLogin(){
         List<LogLogin> list = logLoginService.list();
         return Result.ok(list,"获取登录日志成功");
+    }
+
+    @GetMapping("/loginLogs")
+    public Result<PageResult> getAllLogin(@RequestParam(value = "pageNum", required = true) Integer pageNum,
+                                          @RequestParam(value = "pageSize", required = true) Integer pageSum){
+        PageResult res = logLoginService.getLogs(pageNum, pageSum);
+        if(res == null)
+            return Result.fail("获取日志失败");
+        return Result.ok(res);
+    }
+
+    @DeleteMapping("/deleteLogs")
+    public Result deleteLogs(@RequestBody List<Integer> ids){
+        Boolean flag = logLoginService.deleteLogs(ids);
+        if(!flag)
+            return Result.ok("删除成功");
+        return Result.fail("删除失败");
     }
 
 }

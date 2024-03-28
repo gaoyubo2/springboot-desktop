@@ -1,5 +1,7 @@
 package cn.cest.os.sso.pojo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogLogin {
+    @TableId(value = "tbid", type = IdType.AUTO)
     private Integer tbid;
     private String username;
     private String ip;
