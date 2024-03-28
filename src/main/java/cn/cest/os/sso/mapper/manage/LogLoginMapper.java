@@ -11,5 +11,5 @@ import java.util.List;
 
 @Mapper
 public interface LogLoginMapper extends BaseMapper<LogLogin> {
-    List<LogLogin> selectByUsernameAndDate(@Param("username") String username, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+//    List<LogLogin> selectByUsernameAndDate(@Param("username") String username, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }
