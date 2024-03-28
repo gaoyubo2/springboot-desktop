@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cest.os.sso.mapper.manage.LogLoginMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.cest.os.sso.pojo.LogLogin">
+        <id column="tbid" property="tbid" />
+        <result column="username" property="username" />
+        <result column="ip" property="ip" />
+        <result column="login_time" property="loginTime" />
+        <result column="success" property="success" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        tbid, username, ip, login_time, success
+    </sql>
+
+</mapper>
